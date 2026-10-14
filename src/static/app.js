@@ -4,32 +4,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
-  // Function to fetch activities from API
+  function renderParticipants(participants) {
+    if (!participants || participants.length === 0) {
+      return "<p class=\"participants-empty\">No students signed up yet.</p>";
+    }
+
+    const items = participants
+      .map((participant) => `<li>${participant}</li>`)
+      .join("");
+
+    return `
+      <div class="participants-section">
+        <h5>Participants</h5>
+        <ul class="participants-list">${items}</ul>
+      </div>
+    `;
+  }
+
   async function fetchActivities() {
     try {
       const response = await fetch("/activities");
       const activities = await response.json();
 
-      // Clear loading message
       activitiesList.innerHTML = "";
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
-      // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
+        const activityCard = document.createElement("article");
         activityCard.className = "activity-card";
 
         const spotsLeft = details.max_participants - details.participants.length;
+        const statusText = spotsLeft > 0 ? `${spotsLeft} spots left` : "Full";
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
+          <div class="activity-card-header">
+            <h4>${name}</h4>
+            <span class="status-badge ${spotsLeft > 0 ? "open" : "full"}">${statusText}</span>
+          </div>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <p><strong>Capacity:</strong> ${details.participants.length}/${details.max_participants}</p>
+          ${renderParticipants(details.participants)}
         `;
 
         activitiesList.appendChild(activityCard);
 
-        // Add option to select dropdown
         const option = document.createElement("option");
         option.value = name;
         option.textContent = name;
@@ -41,11 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle form submission
   signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const activity = document.getElementById("activity").value;
 
     try {
@@ -62,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
@@ -69,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       messageDiv.classList.remove("hidden");
 
-      // Hide message after 5 seconds
       setTimeout(() => {
         messageDiv.classList.add("hidden");
       }, 5000);
@@ -81,6 +99,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Initialize app
   fetchActivities();
 });
