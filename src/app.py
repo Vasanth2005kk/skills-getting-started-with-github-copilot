@@ -38,6 +38,18 @@ activities = {
         "schedule": "Mondays, Wednesdays, Fridays, 2:00 PM - 3:00 PM",
         "max_participants": 30,
         "participants": ["john@mergington.edu", "olivia@mergington.edu"]
+    },
+    "Hackathon": {
+        "description": "Participate in our annual coding competition",
+        "schedule": "Saturdays, 9:00 AM - 5:00 PM",
+        "max_participants": 15,
+        "participants": ["ava@mergington.edu", "liam@mergington.edu"]
+    },
+    "devops": {
+        "description": "Learn about DevOps practices and tools",
+        "schedule": "Wednesdays, 4:00 PM - 5:30 PM",
+        "max_participants": 10,
+        "participants": ["emma@mergington.edu"]
     }
 }
 
